@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#FFE6EE">
-<title>Тыкни ♡</title>
+<title>Тыкни :)</title>
 <style>
   :root{
     --ink:#4A2C3A;
@@ -28,7 +28,6 @@
     touch-action: manipulation;
   }
 
-  /* Холст для частиц */
   #canvas{
     position: fixed;
     inset: 0;
@@ -38,7 +37,6 @@
     z-index: 5;
   }
 
-  /* Центральный контейнер */
   .stage{
     position: relative;
     z-index: 2;
@@ -52,22 +50,68 @@
     text-align: center;
   }
 
-  /* Надпись на фоне, медленно пульсирует */
+  /* Верхний меняющийся текст */
   .hint{
-    font-size: 15px;
-    color: rgba(140, 90, 110, 0.7);
+    position: fixed;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    font-size: 17px;
+    color: #8E6E7A;
     font-family: ui-monospace, Menlo, monospace;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 24px;
-    animation: breathe 3s ease-in-out infinite;
+    letter-spacing: 0.06em;
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+    max-width: 90vw;
+    line-height: 1.4;
+    transition: transform 0.4s cubic-bezier(.2,.9,.3,1.3), opacity 0.3s ease;
+    opacity: 0.9;
   }
-  @keyframes breathe{
-    0%,100% { opacity: 0.55; }
-    50%     { opacity: 1; }
+  .hint.flip{
+    animation: hintPop 0.5s cubic-bezier(.2,.9,.3,1.4) both;
+  }
+  @keyframes hintPop{
+    0%   { transform: translateX(-50%) scale(0.7); opacity: 0; }
+    55%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+    100% { transform: translateX(-50%) scale(1); opacity: 0.95; }
   }
 
-  /* Большая кнопка */
+  /* Финальный большой текст */
+  .finale{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--pink-deep);
+    text-align: center;
+    line-height: 1.25;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 15;
+    text-shadow: 0 4px 20px rgba(193,74,110,0.25);
+    transition: transform 0.6s cubic-bezier(.2,.9,.3,1.4), opacity 0.5s ease;
+    max-width: 88vw;
+  }
+  .finale.show{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .finale .big-heart{
+    display: block;
+    font-size: 56px;
+    margin-bottom: 8px;
+    animation: beat 1.2s ease-in-out infinite;
+  }
+  @keyframes beat{
+    0%,100% { transform: scale(1); }
+    15%     { transform: scale(1.16); }
+    30%     { transform: scale(1); }
+    45%     { transform: scale(1.1); }
+  }
+
   .tap-btn{
     position: relative;
     width: min(78vw, 320px);
@@ -128,40 +172,6 @@
     }
   }
 
-  /* Всплывающее послание */
-  .message{
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(0.6);
-    padding: 26px 30px;
-    border-radius: 28px;
-    background: #FFFFFF;
-    box-shadow: 0 24px 70px rgba(200, 100, 130, 0.35);
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--pink-deep);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 10;
-    text-align: center;
-    line-height: 1.3;
-    max-width: 88vw;
-    transition: transform 0.35s cubic-bezier(.2,.9,.3,1.4), opacity 0.3s ease;
-  }
-  .message.show{
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  .message .heart-line{
-    display: block;
-    font-size: 20px;
-    color: var(--pink);
-    margin-top: 6px;
-    font-weight: 400;
-  }
-
-  /* Счётчик тапов в углу */
   .counter{
     position: fixed;
     bottom: 20px;
@@ -175,7 +185,6 @@
     z-index: 3;
   }
 
-  /* Небольшая рамка из сердечек по краям */
   .corner{
     position: fixed;
     font-size: 22px;
@@ -197,13 +206,12 @@
 
 <canvas id="canvas"></canvas>
 
-<div class="corner tl">♡</div>
-<div class="corner tr">✿</div>
-<div class="corner bl">❀</div>
-<div class="corner br">♡</div>
+<div class="corner tl">✿</div>
+<div class="corner tr">❀</div>
+<div class="corner bl">✿</div>
+<div class="corner br">❀</div>
 
 <div class="stage">
-  <div class="hint" id="hint">нажми на кнопку</div>
   <button class="tap-btn" id="tapBtn">
     <span class="emoji">🌷</span>
     <span class="label">Тыкни сюда</span>
@@ -211,11 +219,15 @@
   </button>
 </div>
 
-<div class="message" id="message"></div>
+<div class="hint" id="hint">нажми куда-нибудь</div>
+<div class="finale" id="finale">
+  <span class="big-heart">🎉</span>
+  Какая же<br>ты крутая
+</div>
 <div class="counter" id="counter">тапов: 0</div>
 
 <script>
-/* ================== ЧАСТИЦЫ (canvas) ================== */
+/* ================== ЧАСТИЦЫ ================== */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let W = 0, H = 0;
@@ -240,12 +252,12 @@ const SHAPES = ['heart', 'circle', 'star', 'sparkle'];
 function rand(min, max){ return Math.random() * (max - min) + min; }
 function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
-/* Взрыв салюта из точки */
-function burst(x, y, count){
+function burst(x, y, count, power){
   count = count || 44;
+  power = power || 1;
   for(let i=0;i<count;i++){
     const angle = (Math.PI * 2 * i) / count + rand(-0.15, 0.15);
-    const speed = rand(3, 9);
+    const speed = rand(3, 9) * power;
     particles.push({
       x, y,
       vx: Math.cos(angle) * speed,
@@ -262,7 +274,6 @@ function burst(x, y, count){
   }
 }
 
-/* Дополнительный «дождь» из верха */
 function rain(count){
   count = count || 20;
   for(let i=0;i<count;i++){
@@ -283,7 +294,6 @@ function rain(count){
   }
 }
 
-/* Рисование формы */
 function drawHeart(x, y, s, rot, color){
   ctx.save();
   ctx.translate(x, y);
@@ -336,7 +346,6 @@ function drawCircle(x, y, s, color){
   ctx.fill();
 }
 
-let raf;
 function loop(){
   ctx.clearRect(0, 0, W, H);
   for(let i = particles.length - 1; i >= 0; i--){
@@ -361,96 +370,134 @@ function loop(){
     }
   }
   ctx.globalAlpha = 1;
-  raf = requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 loop();
 
-/* ================== СООБЩЕНИЯ ================== */
-const messages = [
-  { text: 'Хорошего дня Ди', sub: 'Эммм' },
-  { text: 'Какая же ты классная', sub: 'просто так, на всякий случай' },
-  { text: 'Улыбнись ♡', sub: 'ну пожалуйста' },
-  { text: 'Хорошего настроения', sub: 'лалала' },
-  { text: 'Ты самая лучшая', sub: 'Банковский эксперт' },
-  { text: 'Эм не забывай мне писать', sub: 'я жду' },
-  { text: 'Отдохни сегодня', sub: 'посел работы конечно же' },
-  { text: 'Когда гулять?', sub: 'ток след неделя я на плотно занят' },
+/* ================== ХОД ИГРЫ ================== */
+const tapBtn = document.getElementById('tapBtn');
+const hintEl = document.getElementById('hint');
+const counterEl = document.getElementById('counter');
+const finaleEl = document.getElementById('finale');
+let tapCount = 0;
+let finaleShown = false;
+
+/* Ступени текста сверху */
+const stages = [
+  { at: 0,   text: 'нажми куда-нибудь' },
+  { at: 1,   text: 'ещё разок :)' },
+  { at: 5,   text: 'уже веселее' },
+  { at: 10,  text: 'десять!' },
+  { at: 20,  text: 'давай ещё немного поднажми' },
+  { at: 35,  text: 'опа-опа, ты уже близко' },
+  { at: 50,  text: '' } /* 50+ — показываем финал */
 ];
 
-const tapBtn = document.getElementById('tapBtn');
-const msgEl = document.getElementById('message');
-const counterEl = document.getElementById('counter');
-const hintEl = document.getElementById('hint');
-let tapCount = 0;
-let lastIndex = -1;
-
-function showMessage(){
-  let idx;
-  do { idx = Math.floor(Math.random() * messages.length); }
-  while(idx === lastIndex && messages.length > 1);
-  lastIndex = idx;
-
-  const m = messages[idx];
-  msgEl.innerHTML = m.text + '<span class="heart-line">' + m.sub + '</span>';
-  msgEl.classList.add('show');
-
-  clearTimeout(showMessage._t);
-  showMessage._t = setTimeout(() => {
-    msgEl.classList.remove('show');
-  }, 2200);
+function stageFor(n){
+  let s = stages[0];
+  for(const st of stages){
+    if(n >= st.at) s = st;
+  }
+  return s;
 }
 
-/* ================== ТАП ================== */
-let lastTap = 0;
+function setHint(text){
+  hintEl.textContent = text;
+  hintEl.classList.remove('flip');
+  /* перезапуск анимации */
+  void hintEl.offsetWidth;
+  hintEl.classList.add('flip');
+}
+
+function updateStage(){
+  const s = stageFor(tapCount);
+  if(s.text){
+    setHint(s.text);
+  }
+}
+
+/* Показать финал */
+function showFinale(){
+  if(finaleShown) return;
+  finaleShown = true;
+
+  /* Убираем верхний текст */
+  hintEl.style.opacity = '0';
+
+  /* Скрываем кнопку плавно */
+  tapBtn.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
+  tapBtn.style.transform = 'scale(0.6)';
+  tapBtn.style.opacity = '0.15';
+
+  /* Показываем финальный текст */
+  finaleEl.classList.add('show');
+
+  /* Большой финальный салют — три волны */
+  setTimeout(() => {
+    burst(W/2, H/2, 60, 1.4);
+  }, 200);
+  setTimeout(() => {
+    burst(W*0.25, H*0.4, 45, 1.2);
+    burst(W*0.75, H*0.4, 45, 1.2);
+  }, 700);
+  setTimeout(() => {
+    burst(W*0.5, H*0.3, 50, 1.3);
+    rain(30);
+  }, 1300);
+  setTimeout(() => {
+    /* Ещё пара волн, чтобы было ощутимо празднично */
+    burst(W*0.3, H*0.5, 40, 1.1);
+    burst(W*0.7, H*0.5, 40, 1.1);
+    rain(20);
+  }, 2000);
+
+  /* Вибрация */
+  if(navigator.vibrate) navigator.vibrate([40, 60, 40, 60, 40, 80, 60]);
+}
 
 function onTap(x, y){
-  /* Вспышка салюта в точке тапа */
+  /* Салют в точке тапа */
   burst(x, y, 46);
-
-  /* Немного «дождя» сверху */
   rain(14);
 
-  /* Вибрация, если есть */
-  if(navigator.vibrate) navigator.vibrate([15, 30, 15]);
+  if(navigator.vibrate) navigator.vibrate([12, 25, 12]);
 
-  /* Сообщение */
-  showMessage();
-
-  /* Счётчик */
   tapCount++;
   counterEl.textContent = 'тапов: ' + tapCount;
 
-  if(tapCount === 1) hintEl.textContent = 'ещё разок ♡';
-  else if(tapCount === 5) hintEl.textContent = 'тебе идёт считать';
-  else if(tapCount === 10) hintEl.textContent = '10! неплохо';
-  else if(tapCount === 20) hintEl.textContent = 'ты упорная ♡';
-  else if(tapCount === 35) hintEl.textContent = 'дальше только звёзды ✨';
-  else if(tapCount > 50) hintEl.textContent = 'ладно, ты победила';
+  /* Обновляем ступень текста */
+  updateStage();
 
-  lastTap = Date.now();
+  /* Финал */
+  if(tapCount >= 50){
+    showFinale();
+  }
 }
 
+/* Кнопка */
 tapBtn.addEventListener('click', (e) => {
   e.preventDefault();
+  if(finaleShown) return;
   const r = tapBtn.getBoundingClientRect();
   onTap(r.left + r.width/2, r.top + r.height/2);
 });
 
-/* Дополнительно: тап в любое место экрана тоже работает */
+/* Тап в любое место экрана */
+let lastTapTs = 0;
 document.body.addEventListener('click', (e) => {
-  if(e.target === tapBtn) return;
+  if(finaleShown) return;
   if(e.target.closest('.tap-btn')) return;
-  /* Не спамить от двойных кликов по кнопке */
-  if(Date.now() - lastTap < 200) return;
+  if(Date.now() - lastTapTs < 180) return;
+  lastTapTs = Date.now();
   onTap(e.clientX, e.clientY);
 });
 
-/* На всякий случай защита от скролла */
+/* Защита от скролла */
 document.addEventListener('touchmove', (e) => {
-  if(e.scale && e.scale !== 1){ return; }
-}, {passive: true});
+  if(e.touches.length > 1) e.preventDefault();
+}, {passive: false});
 
-/* Небольшой салют через 1 секунду после загрузки — для первого впечатления */
+/* Приветственный салют через секунду */
 setTimeout(() => {
   burst(W/2, H/2, 30);
 }, 900);
